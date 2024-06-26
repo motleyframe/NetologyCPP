@@ -10,16 +10,19 @@ struct Address {
     std::string index;
 };
 
-void PrintAddr(const Address& a) {
-    std::cout << "City: "s << a.city <<'\n';
-    std::cout << "Street: "s << a.street <<'\n';
-    std::cout << "House #: "s << a.house_number <<'\n';
-    std::cout << "Apartment #: "s << a.apt_number <<'\n';
-    std::cout << "Index: "s << a.index <<'\n';
+std::ostream& operator<<(std::ostream& os, const Address& a) {
+    os << "City: "s << a.city <<'\n';
+    os << "Street: "s << a.street <<'\n';
+    os << "House #: "s << a.house_number <<'\n';
+    os << "Apartment #: "s << a.apt_number <<'\n';
+    os << "Index: "s << a.index <<'\n';
+
+    return os;
 }
 
 int main() {
     Address addr = {"Barrie"s,"Big Bay Point rd"s,555,1,"L4N 3Z7"s};
-    PrintAddr(addr);
+    std::cout<<addr<<std::endl;
+
     return 0;
 }

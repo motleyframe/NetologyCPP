@@ -6,7 +6,7 @@
 #include <sstream>
 #include <queue>
 #include <unistd.h>
-using namespace std;
+using namespace std::string_literals;
 
 typedef std::vector<std::vector<unsigned char>> GRID;
 // ESC-sequence for
@@ -26,25 +26,7 @@ public:
     }
 };
 
-class Universe {
-private:
-    std::string path;
-    std::ifstream ifs;
-    GRID current_grid;
-    GRID previous_grid;
-    Queue<unsigned int,2> uni_queue;
-    unsigned int checksum;
-
-    struct {
-        size_t x;
-        size_t y;
-    } dims;
-
-    bool collapsed;
-    unsigned int generation_counter;
-    unsigned int cells_alive;
-
-    // string to be split by elements
+  // string to be split by elements
     template<typename T>
     std::vector<T> split(const std::string& line) {
         std::istringstream is(line);
@@ -52,17 +34,11 @@ private:
                           std::istream_iterator<T>());
     }
 
-    // get size of grid from the 1st line of config file
-    void set_grid_dimensions() {
-        std::string line;
-        std::getline(ifs,line);
-        const std::vector<size_t> fetch_line = split<size_t>(line.c_str());
-        dims.x=fetch_line[0];
-        dims.y=fetch_line[1];
-    }
+    void clear_grid(GRID& grid) {
+        GRID::iterator it;
 
-    void resize_grid() {
-        current_grid.resize(dims.x,std::vector<unsigned char>(dims.y));
+        for(it=grid.begin(); it != grid.end(); ++it)
+            std::fill(it->begin(),it->end(),0);
     }
 
     unsigned int crc32(const GRID& grid) {
@@ -82,12 +58,43 @@ private:
         return ~crc;
     }
 
+class Universe {
+private:
+    std::string path;
+    std::ifstream ifs;
+    GRID current_grid;
+    GRID previous_grid;
+    Queue<unsigned int,2> uni_queue;
+    unsigned int checksum;
+
+    struct {
+        size_t x;
+        size_t y;
+    } dims;
+
+    bool collapsed;
+    unsigned int generation_counter;
+    unsigned int cells_alive;
+
+    // get size of grid from the 1st line of config file
+    void set_grid_dimensions() {
+        std::string line;
+        std::getline(ifs,line);
+        const std::vector<size_t> fetch_line = split<size_t>(line.c_str());
+        dims.x=fetch_line[0];
+        dims.y=fetch_line[1];
+    }
+
+    void resize_grid() {
+        current_grid.resize(dims.x,std::vector<unsigned char>(dims.y));
+    }
+
     // fetch each line with live cells coordinates
     void fetch_grid() {
         std::string line;
 
         while(std::getline(ifs,line)) {
-                //split coordinates from std::string to numeric vector
+                //split coordinates from string to numeric vector
                 const std::vector<size_t> fetch_line = split<size_t>(line.c_str());
                 current_grid[fetch_line[0]]
                             [fetch_line[1]] = 0x1;            // mark cell as alive
@@ -118,13 +125,6 @@ private:
         for(size_t r=0; r<dims.x; ++r)
                 for(size_t c=0; c<dims.y; ++c)
                     set_cell_neighbors(r,c);
-    }
-
-    void clear_grid(GRID& grid) {
-        GRID::iterator it;
-
-        for(it=grid.begin(); it != grid.end(); ++it)
-            std::fill(it->begin(),it->end(),0);
     }
 
     void set_alive_cells_counter() {
@@ -159,7 +159,7 @@ public:
             if(dims.x || dims.y) {               // only if grid size is not 0x0
                 resize_grid();                       // resize 2d-vector
                 fetch_grid();                        // mark cells as alive or dead
-		ifs.close();
+                ifs.close();
                 set_alive_cells_counter();            // count live cells, set counter
 
                 if(cells_alive) {                      // if someone is alive
@@ -204,34 +204,34 @@ public:
             ++generation_counter;
     }
 
-    void show() {
+    void show() const {
         for(const auto& x : current_grid) {
             for(const char y : x)
                 std::cout<< RED << (y&1 ? " * "s : "\033[35m - "s)<< RESET
                          << std::flush;
-            std::cout<<'\n'<< std::flush;
+            std::cout << std::endl;
         }
     }
 
     ~Universe() { }
 
-    inline unsigned int get_generation_info() {
+    inline unsigned int get_generation_info() const {
         return generation_counter;
     }
 
-    inline bool is_collapsed() {
+    inline bool is_collapsed() const {
         return collapsed;
     }
 
-    inline bool dims_0x0() {
+    inline bool dims_0x0() const {
         return !dims.x && !dims.y;
     }
 
-    inline bool isAlive(const char& cell) {
+    inline bool isAlive(const char& cell) const {
         return cell & 0x1;
     }
 
-    inline unsigned int count_live_cells () {
+    inline unsigned int count_live_cells () const {
         return cells_alive;
     }
 };
@@ -251,7 +251,7 @@ void clear_screen() {
         }
 
         bool flag;
-        while( !U.is_collapsed() || (U.get_generation_info()==1)) {
+        while( !U.is_collapsed() || (U.get_generation_info()==1) ) {
             clear_screen();
 
             std::cout<<"Generation: "s<< U.get_generation_info()

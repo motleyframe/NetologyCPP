@@ -12,6 +12,13 @@ void ChangeBalance(Account& acct,const double& new_balance) {
     acct.balance = new_balance;
 }
 
+std::ostream& operator<<(std::ostream& os, const Account& a) {
+    os <<"Account #: "s << a.acct_number << '\n'
+       <<"Name: "s <<a.client_name << '\n'
+       <<"Balance: "s <<a.balance << '\n';
+    return os;
+}
+
 int main() {
     Account my_acct;
     std::cout<<"Input account number: "s;
@@ -26,9 +33,8 @@ int main() {
     std::cin>>new_balance;
     my_acct.balance = new_balance;
     std::cout<<"-------------------\n"s;
-    std::cout<<"Account #: "s << my_acct.acct_number << '\n'
-             <<"Name: "s <<my_acct.client_name << '\n'
-             <<"Balance: "s <<my_acct.balance << '\n';
+
+    std::cout<<my_acct;
 
     return 0;
 }

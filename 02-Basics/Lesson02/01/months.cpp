@@ -68,7 +68,7 @@ int main() {
     while(static_cast<unsigned short>(m)) {
         std::cout<<"Input month: "s;
         std::cin>>m;
-        std::cout<<(m==0 ? "Terminating...\n"s : ShowMonth(m)+"\n"s);
+        std::cout<<(m==0 ? "Terminating...\n"s : ShowMonth(m))<<std::endl;
     }
 
     return 0;
