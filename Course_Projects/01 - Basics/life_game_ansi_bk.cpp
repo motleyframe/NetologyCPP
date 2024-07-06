@@ -1,3 +1,9 @@
+/* #ToDo: 
+1) try - catch in fetch()
+2) enum errors
+
+*/
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -9,11 +15,7 @@
 using namespace std::string_literals;
 
 enum class Error {
-    SUCCESS,
-    OUT_OF_BORDERS,
-    CONFIG_FILE_NOT_OPEN,
-    CONFIG_FILE_EMPTY,
-    INVALID_GRID_SIZE
+    
 };
 
 typedef std::vector<std::vector<unsigned char>> GRID;
@@ -186,18 +188,18 @@ public:
         clear_grid(current_grid);
         for(size_t r=0; r<dims.x; ++r) {
             for(size_t c=0; c<dims.y; ++c) {
-                auto& prev = previous_grid[r][c];
-                auto& curr = current_grid[r][c];
+                auto *prev = &previous_grid[r][c];
+                auto *curr = &current_grid[r][c];
 
-                if(!prev) continue;                        // cell is not alive + no neighbors. Ignore.
+                if(!*prev) continue;                        // cell is not alive + no neighbors. Ignore.
 
-                if((!isAlive(prev) && ((prev>>1)==0x3)) ||     // dead cell with 3 neighbors comes to life
-                    (isAlive(prev) && ((prev>>1)==0x2 || ((prev>>1)==0x3))))   // alive cell with 2 or 3 neighbors...
-                    curr = 0x1;                                  // ...doesn't die
+                if((!isAlive(*prev) && ((*prev>>1)==0x3)) ||     // dead cell with 3 neighbors comes to life
+                    (isAlive(*prev) && ((*prev>>1)==0x2 || ((*prev>>1)==0x3))))   // alive cell with 2 or 3 neighbors...
+                    *curr = 0x1;                                  // ...doesn't die
 
                 // live cell with >3 or <2 neighbors ...
-                    if(isAlive(prev) && ((prev>>1) > 0x3 || (prev>>1) < 0x2))
-                        curr = 0x0;             // ...dies
+                    if(isAlive(*prev) && ((*prev>>1) > 0x3 || (*prev>>1) < 0x2))
+                        *curr = 0x0;             // ...dies
                 }
             }
         // bypass new grid, count neighbors of each cell,set bits
