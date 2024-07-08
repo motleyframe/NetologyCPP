@@ -38,9 +38,9 @@ public:
 
 int main() {
     char ans;
-    Counter* counter = nullptr;
+    Counter* c_ptr = nullptr;
 
-    std::cout<<"Do you want to initialize counter's value? (y/n) "s;
+    std::cout<<"Do you want to initialize c_ptr's value? (y/n) "s;
     std::cin>>ans;
 
     int init_value=0;
@@ -48,9 +48,9 @@ int main() {
     if(ans=='y') {
         std::cout<<"Input initial value : "s;
         std::cin>>init_value;
-        counter = new Counter(init_value);
+        c_ptr = new Counter(init_value);
     } else {
-        counter = new Counter();
+        c_ptr = new Counter();
     }
 
     bool state = true;
@@ -63,21 +63,21 @@ int main() {
 
         switch(cmd) {
             case '+':
-                counter->inc();
+                c_ptr->inc();
                 break;
 
             case '-':
-                counter->dec();
+                c_ptr->dec();
                 break;
 
             case '=':
-                counter->print();
+                c_ptr->print();
                 break;
 
             case 'x':
                 std::cout<<"Goodbye!\n"s;
                 state = false;
-                delete counter;
+                delete c_ptr;
                 break;
 
             default:
