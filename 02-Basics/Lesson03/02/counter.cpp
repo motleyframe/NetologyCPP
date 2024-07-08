@@ -6,7 +6,6 @@ class Counter {
 private:
     int value_ = 0;
 
-public:
     void initialize() {
         value_ = 1;
     }
@@ -15,6 +14,7 @@ public:
         value_ = val;
     }
 
+public:
     Counter() {
         this->initialize();
     }
@@ -38,18 +38,20 @@ public:
 
 int main() {
     char ans;
-    int init_value=0;
+    Counter* counter = nullptr;
 
     std::cout<<"Do you want to initialize counter's value? (y/n) "s;
     std::cin>>ans;
 
-    Counter counter;
+    int init_value=0;
 
     if(ans=='y') {
         std::cout<<"Input initial value : "s;
         std::cin>>init_value;
-        counter.initialize(init_value);
-    } else counter.initialize();
+        counter = new Counter(init_value);
+    } else {
+        counter = new Counter();
+    }
 
     bool state = true;
 
@@ -61,20 +63,21 @@ int main() {
 
         switch(cmd) {
             case '+':
-                counter.inc();
+                counter->inc();
                 break;
 
             case '-':
-                counter.dec();
+                counter->dec();
                 break;
 
             case '=':
-                counter.print();
+                counter->print();
                 break;
 
             case 'x':
                 std::cout<<"Goodbye!\n"s;
                 state = false;
+                delete counter;
                 break;
 
             default:
