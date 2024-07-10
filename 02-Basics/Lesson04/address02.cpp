@@ -95,6 +95,7 @@ int main() {
         std::vector<Address_struct> address_list;
         //разберём содержимое в вектор
         a.fetch_data(ifs,address_list);
+        ifs.close();
 
         //отсортируем по городам алгоритмом sort с лямбда-функцией
         std::sort(address_list.begin(),address_list.end(),[]
@@ -112,7 +113,6 @@ int main() {
         for(const auto& e : address_list) {
             write_struct_to_file(ofs,e);
         }
-        ifs.close();
         ofs.close();
     }
 
