@@ -1,9 +1,12 @@
+#include <algorithm>
+#include <exception>
 #include <fstream>
 #include <ios>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include "boost/lexical_cast.hpp"
 
 using namespace std::string_literals;
@@ -19,11 +22,14 @@ struct Address_struct {
 class Addr {
 private:
     int num_ = 0;
+    std::ifstream ifs_;
+    std::ofstream ofs_;
     std::vector<std::string> buffer_;
+    bool error_state_ = false;
 
-    void get_blocks_number(std::ifstream& ifs) {
+    void get_blocks_number() {
             std::string line;
-            std::getline(ifs,line);
+            std::getline(ifs_,line);
 
         try {
             num_ = boost::lexical_cast<int>(line);
@@ -32,10 +38,10 @@ private:
         }
     }
 
-    void get_block(std::ifstream& ifs) {
+    void get_block() {
         std::string line;
         for(int i=0; i<STRUCT_LEN; ++i) {
-            std::getline(ifs,line);
+            std::getline(ifs_,line);
             buffer_.push_back(line);
         }
     }
@@ -53,54 +59,78 @@ private:
     }
 
 public:
-    Addr(std::ifstream& ifs) {
-        if(!ifs.is_open()) {
+    Addr(const std::string& input_path) {
+        ifs_.open(input_path);
+        if(!ifs_.is_open()) {
+            error_state_ = true;
             throw std::runtime_error("Open error\n"s);
         } else {
-            get_blocks_number(ifs);
+            error_state_ = false;
+            get_blocks_number();
         }
     }
 
-    void fetch_data(std::ifstream& ifs, std::vector<Address_struct>& target) {
+    inline bool get_error_state() {
+        return error_state_;
+    }
+
+    void fetch_data(std::vector<Address_struct>& target) {
         std::string line;
 
         for(int i=0; i<num_; ++i) {
             Address_struct addr;
-            get_block(ifs);
+            get_block();
             addr = parse_block();
             target.push_back(addr);
         }
     }
+
+    void open_output_file(const std::string& output_path,const std::ios_base::openmode& openmode) {
+        ofs_.open(output_path,openmode);
+        if(!ofs_.is_open()) {
+            throw std::runtime_error("Open error\n"s);
+            error_state_ = true;
+        }
+        error_state_ = false;
+        return ;
+    }
+
+    void process_data(std::vector<Address_struct>& vault) {
+        ofs_ << vault.size() << '\n';
+        for(const auto& addr : vault) {
+            ofs_  << addr.city <<", "s
+                  << addr.street << ", "s
+                  << addr.house << ", "s
+                  << addr.apt<<'\n';
+        }
+        return ;
+    }
+
+    ~Addr() {
+        try {
+            ifs_.close();
+            ofs_.close();
+        } catch (...) { }
+    }
 };
 
-void write_struct_to_file(std::ostream& os, const Address_struct& addr) {
-    os  << addr.city <<", "s
-        << addr.street << ", "s
-        << boost::lexical_cast<std::string>(addr.house) << ", "s
-        << boost::lexical_cast<std::string>(addr.apt)<<"\n"s;
-}
-
 int main() {
-    std::ifstream ifs;
     std::string input_path = "./in.txt"s;
-    ifs.open(input_path);
+    std::vector<Address_struct>* addr_ptr = nullptr;
 
-    if(!ifs.is_open()) {
-        throw std::runtime_error("Open error\n"s);
-    } else {
-        std::vector<Address_struct> address_list;
-        Addr a(ifs);
+    Addr a(input_path);
 
-        a.fetch_data(ifs,address_list);
+    if(!a.get_error_state()) {
+        addr_ptr = new std::vector<Address_struct>();       // сюда запишем результат разбора файла
+        a.fetch_data(*addr_ptr);                            // разберём содержимое в вектор
+    }
 
-        std::ofstream ofs;
-        std::string output_path = "./out.txt"s;
-        ofs.open(output_path, std::ios::app);
-        for(const auto& e : address_list) {
-            write_struct_to_file(ofs,e);
-        }
-        ifs.close();
-        ofs.close();
+    std::string output_path = "./out.txt"s;                 // режим APPEND: создать, если не существует
+    a.open_output_file(output_path,std::ios::app);          // если существует, то дописать в конец
+
+    if(!a.get_error_state()) {
+        a.process_data(*addr_ptr);
+        delete addr_ptr;
     }
 
     return 0;
