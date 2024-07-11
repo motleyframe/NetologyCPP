@@ -6,10 +6,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
 #include "boost/lexical_cast.hpp"
 
-using namespace std::string_literals;
 const int STRUCT_LEN = 4;
 
 struct Address_struct {
