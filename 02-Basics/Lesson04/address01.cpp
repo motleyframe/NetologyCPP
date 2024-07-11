@@ -8,6 +8,8 @@
 #include <vector>
 #include "boost/lexical_cast.hpp"
 
+using namespace std::string_literals;
+
 const int STRUCT_LEN = 4;
 
 struct Address_struct {
@@ -119,7 +121,8 @@ int main() {
     Addr a(input_path);
 
     if(!a.get_error_state()) {
-        addr_ptr = new std::vector<Address_struct>();       // сюда запишем результат разбора файла
+        if(addr_ptr == nullptr)
+            addr_ptr = new std::vector<Address_struct>();   // сюда запишем результат разбора файла
         a.fetch_data(*addr_ptr);                            // разберём содержимое в вектор
     }
 
