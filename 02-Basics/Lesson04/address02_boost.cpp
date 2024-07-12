@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "boost/lexical_cast.hpp"
 
 using namespace std::string_literals;
 
@@ -27,8 +28,12 @@ private:
     void get_blocks_number() {
             std::string line;
             std::getline(ifs_,line);
-            num_ = std::stoi(line);
-            return ;
+
+        try {
+            num_ = boost::lexical_cast<int>(line);
+        } catch(boost::bad_lexical_cast& e) {
+            std::cerr<<"Exception: "s<<e.what()<<std::endl;
+        }
     }
 
     void get_block() {
@@ -44,8 +49,8 @@ private:
 
         addr.city=buffer_[0];
         addr.street=buffer_[1];
-        addr.house=std::stoi(buffer_[2]);
-        addr.apt=std::stoi(buffer_[3]);
+        addr.house=boost::lexical_cast<int>(buffer_[2]);
+        addr.apt=boost::lexical_cast<int>(buffer_[3]);
         buffer_.resize(0);
 
         return addr;
