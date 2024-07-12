@@ -16,13 +16,18 @@ struct Address_struct {
     int apt = 0;
 };
 
+enum class OperationResult {
+    OPEN_SUCCESS,
+    OPEN_FAILED
+};
+
 class Addr {
 private:
     int num_ = 0;
     std::ifstream ifs_;
     std::ofstream ofs_;
     std::vector<std::string> buffer_;
-    bool error_state_ = false;
+    OperationResult result_;
 
     void get_blocks_number() {
             std::string line;
@@ -55,16 +60,16 @@ public:
     Addr(const std::string& input_path) {
         ifs_.open(input_path);
         if(!ifs_.is_open()) {
-            error_state_ = true;
+            result_ = OperationResult::OPEN_FAILED;
             throw std::runtime_error("Open error\n"s);
         } else {
-            error_state_ = false;
+            result_ = OperationResult::OPEN_SUCCESS;
             get_blocks_number();
         }
     }
 
-    inline bool get_error_state() {
-        return error_state_;
+    inline OperationResult get_error_state() {
+        return result_;
     }
 
     void fetch_data(std::vector<Address_struct>& target) {
@@ -78,14 +83,15 @@ public:
         }
     }
 
-    void open_output_file(const std::string& output_path,const std::ios_base::openmode& openmode) {
+    OperationResult open_output_file(const std::string& output_path,const std::ios_base::openmode& openmode) {
         ofs_.open(output_path,openmode);
         if(!ofs_.is_open()) {
             throw std::runtime_error("Open error\n"s);
-            error_state_ = true;
+            result_ = OperationResult::OPEN_FAILED;
+            return OperationResult::OPEN_FAILED;
         }
-        error_state_ = false;
-        return ;
+        result_ = OperationResult::OPEN_SUCCESS;
+        return OperationResult::OPEN_SUCCESS;
     }
 
     void process_data(std::vector<Address_struct>& vault) {
@@ -118,18 +124,17 @@ int main() {
 
     Addr a(input_path);
 
-    if(!a.get_error_state()) {
+    if(a.get_error_state() == OperationResult::OPEN_SUCCESS) {
         if(addr_ptr == nullptr)
             addr_ptr = new std::vector<Address_struct>();   // сюда запишем результат разбора файла
         a.fetch_data(*addr_ptr);                            // разберём содержимое в вектор
-    }
 
-    std::string output_path = "./out.txt"s;                 // режим APPEND: создать, если не существует
-    a.open_output_file(output_path,std::ios::app);          // если существует, то дописать в конец
+        std::string output_path = "./out.txt"s;                 // режим APPEND: создать, если не существует
 
-    if(!a.get_error_state()) {
-        a.process_data(*addr_ptr);
-        delete addr_ptr;
+        if(a.open_output_file(output_path,std::ios::app) == OperationResult::OPEN_SUCCESS) {          // если существует, то дописать в конец
+            a.process_data(*addr_ptr);
+            delete addr_ptr;
+        }
     }
 
     return 0;
