@@ -124,9 +124,10 @@ int main() {
             addr_ptr = new std::vector<Address_struct>();   // сюда запишем результат разбора файла
         a.fetch_data(*addr_ptr);                            // разберём содержимое в вектор
 
-        std::string output_path = "./out.txt"s;                 // режим APPEND: создать, если не существует
+        std::string output_path = "./out.txt"s;
 
-        if(a.open_output_file(output_path,std::ios::app) == OperationResult::OPEN_SUCCESS) {          // если существует, то дописать в конец
+        // режим APPEND: создать, если не существует. Иначе дописать в конец
+        if(a.open_output_file(output_path,std::ios::app) == OperationResult::OPEN_SUCCESS) {
             a.process_data(*addr_ptr);
             delete addr_ptr;
         }
