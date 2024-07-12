@@ -81,6 +81,11 @@ public:
             addr = parse_block();
             target.push_back(addr);
         }
+        try {
+            ifs_.close();
+        } catch(...) { }
+
+        return ;
     }
 
     OperationResult open_output_file(const std::string& output_path,const std::ios_base::openmode& openmode) {
@@ -112,7 +117,6 @@ public:
 
     ~Addr() {
         try {
-            ifs_.close();
             ofs_.close();
         } catch (...) { }
     }
@@ -129,7 +133,7 @@ int main() {
             addr_ptr = new std::vector<Address_struct>();   // сюда запишем результат разбора файла
         a.fetch_data(*addr_ptr);                            // разберём содержимое в вектор
 
-        std::string output_path = "./out.txt"s
+        std::string output_path = "./out.txt"s;
 
         // режим APPEND: создать, если не существует. Иначе дописать в конец
         if(a.open_output_file(output_path,std::ios::app) == OperationResult::OPEN_SUCCESS) {

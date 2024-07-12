@@ -81,6 +81,11 @@ public:
             addr = parse_block();
             target.push_back(addr);
         }
+
+        try {
+            ifs_.close();
+        } catch(...) { }
+        return ;
     }
 
     OperationResult open_output_file(const std::string& output_path,const std::ios_base::openmode& openmode) {
@@ -107,7 +112,6 @@ public:
 
     ~Addr() {
         try {
-            ifs_.close();
             ofs_.close();
         } catch (...) { }
     }
