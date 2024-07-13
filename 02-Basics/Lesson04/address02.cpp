@@ -76,11 +76,10 @@ public:
         std::string line;
 
         for(int i=0; i<num_; ++i) {
-            Address_struct addr;
             get_block();
-            addr = parse_block();
-            target.push_back(addr);
+            target.push_back(parse_block());
         }
+
         try {
             ifs_.close();
         } catch(...) { }
