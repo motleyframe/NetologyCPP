@@ -94,10 +94,10 @@ public:
         if(!ofs_.is_open()) {
             throw std::runtime_error("Open error\n"s);
             result_ = OperationResult::OPEN_FAILED;
-            return OperationResult::OPEN_FAILED;
+            return result_;
         }
         result_ = OperationResult::OPEN_SUCCESS;
-        return OperationResult::OPEN_SUCCESS;
+        return result_;
     }
 
     void process_data(std::vector<Address_struct>& vault) {
