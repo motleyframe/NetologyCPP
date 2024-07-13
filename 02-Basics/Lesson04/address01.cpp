@@ -68,7 +68,7 @@ public:
         }
     }
 
-    inline OperationResult get_error_state() {
+    inline OperationResult get_state() {
         return result_;
     }
 
@@ -123,7 +123,7 @@ int main() {
 
     Addr a(input_path);
 
-    if(a.get_error_state() == OperationResult::OPEN_SUCCESS) {
+    if(a.get_state() == OperationResult::OPEN_SUCCESS) {
         if(addr_ptr == nullptr)
             addr_ptr = new std::vector<Address_struct>();   // сюда запишем результат разбора файла
         a.fetch_data(*addr_ptr);                            // разберём содержимое в вектор

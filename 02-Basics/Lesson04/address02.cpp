@@ -68,7 +68,7 @@ public:
         }
     }
 
-    inline OperationResult get_error_state() {
+    inline OperationResult get_state() {
         return result_;
     }
 
@@ -88,7 +88,8 @@ public:
         return ;
     }
 
-    OperationResult open_output_file(const std::string& output_path,const std::ios_base::openmode& openmode) {
+    OperationResult open_output_file(const std::string& output_path,
+				     const std::ios_base::openmode& openmode) {
         ofs_.open(output_path,openmode);
         if(!ofs_.is_open()) {
             throw std::runtime_error("Open error\n"s);
@@ -128,7 +129,7 @@ int main() {
 
     Addr a(input_path);
 
-    if(a.get_error_state() == OperationResult::OPEN_SUCCESS) {
+    if(a.get_state() == OperationResult::OPEN_SUCCESS) {
         if(addr_ptr == nullptr)
             addr_ptr = new std::vector<Address_struct>();   // сюда запишем результат разбора файла
         a.fetch_data(*addr_ptr);                            // разберём содержимое в вектор
